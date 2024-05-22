@@ -1,0 +1,13 @@
+{% extends "core/base.html" %}
+
+{% block title %}Grade Assignment{% endblock %}
+
+{% block content %}
+<h2>Grade Assignment: {{ submission.assignment.title }}</h2>
+<p>Student: {{ submission.student.username }}</p>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit Grade</button>
+</form>
+{% endblock %}

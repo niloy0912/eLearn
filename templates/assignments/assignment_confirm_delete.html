@@ -1,0 +1,13 @@
+{% extends "core/base.html" %}
+
+{% block title %}Delete Assignment{% endblock %}
+
+{% block content %}
+<h2>Delete Assignment</h2>
+<p>Are you sure you want to delete the assignment "{{ assignment.title }}"?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, delete</button>
+    <a href="{% url 'assignments:assignment_detail' assignment.pk %}">Cancel</a>
+</form>
+{% endblock %}

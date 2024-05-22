@@ -53,20 +53,20 @@ class Teacher(models.Model):
 
 ## Will be Shifted
 
-class Assignment(models.Model):
-    title = models.CharField(max_length=100)
-    description = models.TextField()
-    due_date = models.DateField()
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='assignments')
+# class Assignment(models.Model):
+#     title = models.CharField(max_length=100)
+#     description = models.TextField()
+#     due_date = models.DateField()
+#     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='assignments')
 
-    def __str__(self):
-        return self.title
+#     def __str__(self):
+#         return self.title
 
-class Grade(models.Model):
-    score = models.FloatField()
-    feedback = models.TextField()
-    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='grades')
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='grades')
+# class Grade(models.Model):
+#     score = models.FloatField()
+#     feedback = models.TextField()
+#     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='grades')
+#     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='grades')
 
-    def __str__(self):
-        return f'{self.assignment.title} - {self.student.user.username}'
+#     def __str__(self):
+#         return f'{self.assignment.title} - {self.student.user.username}'

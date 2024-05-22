@@ -57,6 +57,7 @@ INSTALLED_APPS = [
 EXTERNAL_APPS = [
     'core',
     'courses',
+    'assignments',
 ]
 
 INSTALLED_APPS += EXTERNAL_APPS 

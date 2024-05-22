@@ -1,0 +1,12 @@
+{% extends "core/base.html" %}
+
+{% block title %}Submit Assignment{% endblock %}
+
+{% block content %}
+<h2>Submit Assignment: {{ assignment.title }}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+</form>
+{% endblock %}

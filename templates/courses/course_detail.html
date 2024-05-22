@@ -8,7 +8,23 @@
     <p>{{ course.description }}</p>
     <p>Teacher: {{ course.teacher.username }}</p>
 
-    <h3>Enrolled Students:</h3>
+    <h3>Assignments</h3>
+    <ul>
+        {% for assignment in assignments %}
+            <li>
+                <a href="{% url 'assignments:assignment_detail' assignment.pk %}">{{ assignment.title }}</a>
+                {% if request.user == course.teacher %}
+                    - <a href="{% url 'assignments:assignment_update' assignment.pk %}">Edit</a>
+                    - <a href="{% url 'assignments:assignment_delete' assignment.pk %}">Delete</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    {% if request.user == course.teacher %}
+        <a href="{% url 'assignments:assignment_create' %}?course_id={{ course.pk }}">Create New Assignment</a>
+    {% endif %}
+
+    <h3>Enrolled Students</h3>
     <ul>
         {% for enrollment in enrolled_students %}
             <li>{{ enrollment.student.username }}</li>
@@ -16,8 +32,11 @@
     </ul>
 
     {% if request.user.is_authenticated %}
+        {% if error_message %}
+            <p style="color: red;">{{ error_message }}</p>
+        {% endif %}
         {% if is_enrolled %}
-            <p>You are enrolled.</p>
+            <p>You are already enrolled in this course.</p>
         {% else %}
             <form method="post" action="{% url 'courses:enroll_in_course' course.pk %}">
                 {% csrf_token %}
@@ -27,10 +46,8 @@
     {% endif %}
 
     {% if request.user == course.teacher %}
-    <a href="{% url 'courses:course_update' course.pk %}">Edit</a> |
-    <a href="{% url 'courses:course_delete' course.pk %}">Delete</a>
+        <a href="{% url 'courses:course_update' course.pk %}">Edit</a> |
+        <a href="{% url 'courses:course_delete' course.pk %}">Delete</a>
     {% endif %}
-
-{% comment %} test {% endcomment %}
-  </div>
+</div>
 {% endblock %}

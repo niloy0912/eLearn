@@ -1,0 +1,19 @@
+{% extends "core/base.html" %}
+
+{% block title %}Assignment Details{% endblock %}
+
+{% block content %}
+<h2>{{ assignment.title }}</h2>
+<p>{{ assignment.description }}</p>
+<p>Due Date: {{ assignment.due_date }}</p>
+
+<h3>Submissions</h3>
+<ul>
+    {% for submission in submissions %}
+        <li>{{ submission.student.username }}: <a href="{% url 'assignments:assignment_grade' submission.pk %}">Grade</a></li>
+    {% endfor %}
+</ul>
+<a href="{% url 'assignments:assignment_update' assignment.pk %}">Edit Assignment</a> |
+<a href="{% url 'assignments:assignment_delete' assignment.pk %}">Delete Assignment</a> |
+<a href="{% url 'assignments:assignment_submit' assignment.pk %}">Submit Assignment</a>
+{% endblock %}

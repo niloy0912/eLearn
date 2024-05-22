@@ -16,10 +16,12 @@ class CourseListView(View):
 class CourseDetailView(View):
     def get(self, request, pk):
         course = get_object_or_404(Course, pk=pk)
+        assignments = course.assignments.all()
         enrolled_students = course.enrollments.all()
         is_enrolled = enrolled_students.filter(student=request.user).exists()
         return render(request, 'courses/course_detail.html', {
             'course': course,
+            'assignments': assignments,
             'enrolled_students': enrolled_students,
             'is_enrolled': is_enrolled
         })
@@ -72,11 +74,24 @@ class CourseDeleteView(View):
         course.delete()
         return redirect('courses:course_list')
 
+
 @method_decorator(login_required, name='dispatch')
 class EnrollInCourseView(View):
     def post(self, request, pk):
         course = get_object_or_404(Course, pk=pk)
+        # Check if the user is the teacher of the course
+        if course.teacher == request.user:
+            # Redirect to the course detail page with an error message
+            return render(request, 'courses/course_detail.html', {
+                'course': course,
+                'enrolled_students': course.enrollments.all(),
+                'is_enrolled': False,
+                'error_message': "Teachers cannot enroll in their own courses."
+            })
+        
+        # Check if the user is already enrolled
         if not Enrollment.objects.filter(student=request.user, course=course).exists():
             Enrollment.objects.create(student=request.user, course=course)
+        
         return redirect('courses:course_detail', pk=pk)
 
