@@ -3,17 +3,36 @@
 {% block title %}Assignment Details{% endblock %}
 
 {% block content %}
-<h2>{{ assignment.title }}</h2>
-<p>{{ assignment.description }}</p>
-<p>Due Date: {{ assignment.due_date }}</p>
+<div class="assignment-container">
+    <h2>{{ assignment.title }}</h2>
+    <p>{{ assignment.description }}</p>
+    <p><strong>Due Date:</strong> {{ assignment.due_date }}</p>
+    
+    <hr>
 
-<h3>Submissions</h3>
-<ul>
-    {% for submission in submissions %}
-        <li>{{ submission.student.username }}: <a href="{% url 'assignments:assignment_grade' submission.pk %}">Grade</a></li>
-    {% endfor %}
-</ul>
-<a href="{% url 'assignments:assignment_update' assignment.pk %}">Edit Assignment</a> |
-<a href="{% url 'assignments:assignment_delete' assignment.pk %}">Delete Assignment</a> |
-<a href="{% url 'assignments:assignment_submit' assignment.pk %}">Submit Assignment</a>
+    <h3>Submissions</h3>
+    <ul>
+        {% for submission in submissions %}
+            <li>
+                {{ submission.student.username }}: 
+                {% if request.user == assignment.course.teacher %}
+                    <a href="{% url 'assignments:assignment_grade' submission.pk %}" class="btn">Grade</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    
+    <hr>
+
+    {% if request.user == assignment.course.teacher %}
+        <a href="{% url 'assignments:assignment_update' assignment.pk %}" class="btn">Edit Assignment</a>
+        <a href="{% url 'assignments:assignment_delete' assignment.pk %}" class="btn">Delete Assignment</a>
+    {% endif %}
+    {% if request.user.is_authenticated and not user_submission_exists and not is_teacher %}
+        <a href="{% url 'assignments:assignment_submit' assignment.pk %}" class="btn">Submit Assignment</a>
+    {% endif %}
+    {% if user_submission_exists %}
+        <p>You have already submitted this assignment.</p>
+    {% endif %}
+</div>
 {% endblock %}

@@ -6,7 +6,7 @@
 <div class="course-container">
     <h2>{{ course.title }}</h2>
     <p>{{ course.description }}</p>
-    <p>Teacher: {{ course.teacher.username }}</p>
+    <p><strong>Teacher:</strong> {{ course.teacher.username }}</p>
 
     <h3>Assignments</h3>
     <ul>
@@ -14,14 +14,14 @@
             <li>
                 <a href="{% url 'assignments:assignment_detail' assignment.pk %}">{{ assignment.title }}</a>
                 {% if request.user == course.teacher %}
-                    - <a href="{% url 'assignments:assignment_update' assignment.pk %}">Edit</a>
-                    - <a href="{% url 'assignments:assignment_delete' assignment.pk %}">Delete</a>
+                    - <a href="{% url 'assignments:assignment_update' assignment.pk %}" class="btn">Edit</a>
+                    - <a href="{% url 'assignments:assignment_delete' assignment.pk %}" class="btn">Delete</a>
                 {% endif %}
             </li>
         {% endfor %}
     </ul>
     {% if request.user == course.teacher %}
-        <a href="{% url 'assignments:assignment_create' %}?course_id={{ course.pk }}">Create New Assignment</a>
+        <a href="{% url 'assignments:assignment_create' %}?course_id={{ course.pk }}" class="btn">Create New Assignment</a>
     {% endif %}
 
     <h3>Enrolled Students</h3>
@@ -33,21 +33,21 @@
 
     {% if request.user.is_authenticated %}
         {% if error_message %}
-            <p style="color: red;">{{ error_message }}</p>
+            <p class="error-message">{{ error_message }}</p>
         {% endif %}
         {% if is_enrolled %}
             <p>You are already enrolled in this course.</p>
         {% else %}
             <form method="post" action="{% url 'courses:enroll_in_course' course.pk %}">
                 {% csrf_token %}
-                <button type="submit">Enroll</button>
+                <button type="submit" class="btn">Enroll</button>
             </form>
         {% endif %}
     {% endif %}
 
     {% if request.user == course.teacher %}
-        <a href="{% url 'courses:course_update' course.pk %}">Edit</a> |
-        <a href="{% url 'courses:course_delete' course.pk %}">Delete</a>
+        <a href="{% url 'courses:course_update' course.pk %}" class="btn">Edit</a> |
+        <a href="{% url 'courses:course_delete' course.pk %}" class="btn">Delete</a>
     {% endif %}
 </div>
 {% endblock %}
