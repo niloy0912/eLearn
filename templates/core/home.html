@@ -1,0 +1,30 @@
+{% extends "core/base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    {% if user.is_authenticated %}
+        <h1>Welcome, {{ username }}!</h1>
+    {% else %}
+        <h1>Welcome to eLearn</h1>
+        <p>Your one-stop solution for managing courses, assignments, and more.</p>
+        <p>Login or Signup to view courses</p>
+    {% endif %}
+    <div class="home-links">
+        {% if not user.is_authenticated %}
+            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'signup' %}">Register</a>
+        {% endif %}
+    </div>
+    <br>
+</div>
+
+{% if user.is_authenticated %}
+    <div class='home-container'>
+        <h1>Available Courses</h1>
+        <p><a href="{% url 'courses:course_list' %}">View Courses</a></p>
+    </div>
+{% endif %}
+
+{% endblock %}

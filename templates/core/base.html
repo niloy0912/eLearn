@@ -1,0 +1,30 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Learning Management System{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/courses.css' %}">
+
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{% url 'signup' %}">Register</a></li>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'log_out' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% block content %}
+    {% endblock %}
+    
+    <footer>
+        <p>&copy; 2024 eLearn</p>
+    </footer>
+</body>
+</html>

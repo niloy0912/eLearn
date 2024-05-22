@@ -1,0 +1,157 @@
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-top: 20px;
+}
+
+
+nav {
+    background-color: #007BFF;
+    color: white;
+    width: 100%;
+    padding: 10px 0;
+    position: fixed;  /* Changed from absolute to fixed */
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+header {
+    margin: 70px 0 20px 0; /* Adjusted margin to account for fixed navbar */
+}
+
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    width: 100%;
+}
+
+.login-container, .home-container, .register-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+    margin-top: 50px;
+    margin-bottom: 100px;
+}
+
+.login-container h1, .home-container h1, .register-container h1 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    text-align: center;
+}
+
+.login-container form, .home-container form, .register-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-container .form-group, .home-container .form-group, .register-container .form-group {
+    margin-bottom: 15px;
+    width: 100%; /* Ensure form fields take full width */
+}
+
+.login-container label, .home-container label, .register-container label {
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.login-container input, .login-container select, .home-container input, .home-container select, .register-container input, .register-container select {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    appearance: none; /* Removes default styling for the select element */
+    background-color: #fff;
+}
+
+.login-container select, .home-container select, .register-container select {
+    cursor: pointer;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23007BFF" d="M2 0L0 2h4zM2 5L0 3h4z"/></svg>'); /* Custom arrow */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px;
+}
+
+.login-container button, .home-container button, .register-container button {
+    padding: 10px;
+    font-size: 16px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.login-container button:hover, .home-container button:hover, .register-container button:hover {
+    background-color: #0056b3;
+}
+
+.login-container .error-message, .home-container .error-message, .register-container .error-message {
+    color: red;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.login-container a, .home-container a, .register-container a {
+    color: #007BFF;
+    text-decoration: none;
+    margin-top: 10px;
+    display: block;
+    text-align: center;
+}
+
+.login-container a:hover, .home-container a:hover, .register-container a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+footer {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    margin-top: auto; /* Ensure footer is at the bottom of the page content */
+}

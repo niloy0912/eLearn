@@ -1,0 +1,36 @@
+{% extends "core/base.html" %}
+
+{% block title %}Course Details{% endblock %}
+
+{% block content %}
+<div class="course-container">
+    <h2>{{ course.title }}</h2>
+    <p>{{ course.description }}</p>
+    <p>Teacher: {{ course.teacher.username }}</p>
+
+    <h3>Enrolled Students:</h3>
+    <ul>
+        {% for enrollment in enrolled_students %}
+            <li>{{ enrollment.student.username }}</li>
+        {% endfor %}
+    </ul>
+
+    {% if request.user.is_authenticated %}
+        {% if is_enrolled %}
+            <p>You are enrolled.</p>
+        {% else %}
+            <form method="post" action="{% url 'courses:enroll_in_course' course.pk %}">
+                {% csrf_token %}
+                <button type="submit">Enroll</button>
+            </form>
+        {% endif %}
+    {% endif %}
+
+    {% if request.user == course.teacher %}
+    <a href="{% url 'courses:course_update' course.pk %}">Edit</a> |
+    <a href="{% url 'courses:course_delete' course.pk %}">Delete</a>
+    {% endif %}
+
+{% comment %} test {% endcomment %}
+  </div>
+{% endblock %}

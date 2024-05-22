@@ -1,0 +1,26 @@
+{% extends "core/base.html" %}
+
+{% block title %}Available Courses{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Available Courses</h2>
+    {% if user.is_authenticated and user.is_teacher %}
+    <div class="add-course">
+        <a href="{% url 'courses:course_create' %}" class="btn btn-primary">Add Course</a>
+        </div>
+    {% endif %}
+</div>
+<div class="course-container">
+    <div class="course-tiles">
+        {% for course in courses %}
+            <div class="course-tile">
+                <h3>{{ course.title }}</h3>
+                <p>{{ course.description|truncatewords:20 }}</p>
+                <p><strong>Instructor:</strong> {{ course.teacher.username }}</p>
+                <a href="{% url 'courses:course_detail' course.pk %}">View Details</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
