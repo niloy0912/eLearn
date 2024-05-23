@@ -5,6 +5,7 @@ from .models import Assignment, Submission, Grade
 from .forms import AssignmentForm, SubmissionForm, GradeForm
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 @method_decorator(login_required, name='dispatch')
 class AssignmentListView(View):
@@ -104,15 +105,20 @@ class SubmissionCreateView(View):
         return render(request, 'assignments/submission_form.html', {'form': form, 'assignment': assignment})
 
 
-@method_decorator(login_required, name='dispatch')
-class GradeAssignmentView(View):
+class GradeAssignmentView(LoginRequiredMixin, View):
     def get(self, request, pk):
         submission = get_object_or_404(Submission, pk=pk)
         assignment = submission.assignment
         # Check if the user is the teacher of the course
         if assignment.course.teacher != request.user:
             return HttpResponseForbidden("You are not allowed to grade this assignment.")
-        form = GradeForm()
+        
+        try:
+            grade = submission.grade
+            form = GradeForm(instance=grade)
+        except Grade.DoesNotExist:
+            form = GradeForm()
+        
         return render(request, 'assignments/grade_form.html', {'form': form, 'submission': submission})
 
     def post(self, request, pk):
@@ -121,10 +127,17 @@ class GradeAssignmentView(View):
         # Check if the user is the teacher of the course
         if assignment.course.teacher != request.user:
             return HttpResponseForbidden("You are not allowed to grade this assignment.")
-        form = GradeForm(request.POST)
+        
+        try:
+            grade = submission.grade
+            form = GradeForm(request.POST, instance=grade)
+        except Grade.DoesNotExist:
+            form = GradeForm(request.POST)
+        
         if form.is_valid():
             grade = form.save(commit=False)
             grade.submission = submission
             grade.save()
-            return redirect('assignments:assignment_detail', pk=submission.assignment.pk)
+            return redirect('grades:course_detail', pk=assignment.course.pk)
+        
         return render(request, 'assignments/grade_form.html', {'form': form, 'submission': submission})

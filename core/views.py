@@ -1,23 +1,74 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db import IntegrityError
-from django.contrib.auth import login, logout, authenticate
-
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.contrib.auth import login, logout
+from .models import Student, Teacher
 from django.views import View
+from courses.models import Course
+from assignments.models import Submission
 from .forms import *
 
 
-# Create your views here.
+@method_decorator(login_required, name='dispatch')
 class Home(View):
     def get(self, request):
         context = {}
         if request.user.is_authenticated:
             context['username'] = request.user.username
+            if request.user.is_student:
+                self.ensure_student_record(request.user)
+                student = get_object_or_404(Student, user=request.user)
+                enrolled_courses = student.enrolled_courses.all()
+                available_courses = Course.objects.exclude(students=student)
+
+                enrolled_course_details = self.get_course_details(enrolled_courses, request.user)
+                
+                context['enrolled_course_details'] = enrolled_course_details
+                context['available_courses'] = available_courses
+
+            elif request.user.is_teacher:
+                available_courses = Course.objects.filter(teacher=request.user)
+                context['available_courses'] = available_courses
         return render(request, 'core/home.html', context)
     
     def post(self, request):
         return render(request, 'core/home.html')
     
+    def ensure_student_record(self, user):
+        if user.is_student and not Student.objects.filter(user=user).exists():
+            Student.objects.create(user=user)
     
+    def ensure_teacher_record(self, user):
+        if user.is_teacher and not Teacher.objects.filter(user=user).exists():
+            Teacher.objects.create(user=user)
+    
+    def get_course_details(self, courses, user):
+        course_details = []
+        for course in courses:
+            assignments = course.assignments.all()
+            submissions = Submission.objects.filter(assignment__in=assignments, student=user)
+            total_score = 0
+            total_marks = 0
+            assignment_grades = []
+
+            for assignment in assignments:
+                submission = submissions.filter(assignment=assignment).first()
+                grade = submission.grade if submission and hasattr(submission, 'grade') else None
+                assignment_grades.append((assignment, grade))
+                if grade:
+                    total_score += grade.score
+                    total_marks += assignment.total_marks
+
+            percentage = (total_score / total_marks * 100) if total_marks else 0
+            course_details.append({
+                'course': course,
+                'assignment_grades': assignment_grades,
+                'percentage': percentage
+            })
+        return course_details
+
+
 class Register(View):
     def get(self, request):
         form = CustomUserCreationForm()

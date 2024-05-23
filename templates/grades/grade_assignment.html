@@ -1,0 +1,22 @@
+{% extends "core/base.html" %}
+
+{% block title %}Grade Assignment{% endblock %}
+
+{% block content %}
+<div class="grade-container">
+    <h1>Grade Assignment: {{ assignment.title }}</h1>
+    <h2>Student: {{ student.user.username }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="score">Score:</label>
+            <input type="number" step="0.01" name="score" value="{{ grade.score|default_if_none:'' }}" required>
+        </div>
+        <div class="form-group">
+            <label for="feedback">Feedback:</label>
+            <textarea name="feedback">{{ grade.feedback|default_if_none:'' }}</textarea>
+        </div>
+        <button type="submit">Submit Grade</button>
+    </form>
+</div>
+{% endblock %}

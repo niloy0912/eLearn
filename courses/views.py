@@ -1,9 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
+# from django.views.generic import DetailView
 from .models import Course, Enrollment
 from .forms import CourseForm
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from core.models import Student
 
 
 @method_decorator(login_required, name='dispatch')
@@ -26,6 +28,11 @@ class CourseDetailView(View):
             'is_enrolled': is_enrolled
         })
 
+# class CourseDetailView(DetailView):
+#     model = Course
+#     template_name = 'courses/course_detail.html'
+#     context_object_name = 'course'
+
     def post(self, request, pk):
         course = get_object_or_404(Course, pk=pk)
         if not Enrollment.objects.filter(student=request.user, course=course).exists():
@@ -47,6 +54,7 @@ class CourseCreateView(View):
             course.save()
             return redirect('courses:course_list')
         return render(request, 'courses/course_form.html', {'form': form})
+
 
 @method_decorator(login_required, name='dispatch')
 class CourseUpdateView(View):
@@ -95,3 +103,15 @@ class EnrollInCourseView(View):
         
         return redirect('courses:course_detail', pk=pk)
 
+
+# @method_decorator(login_required, name='dispatch')
+# class EnrollCourseView(View):
+#     def post(self, request, *args, **kwargs):
+#         course_id = kwargs.get('course_id')
+#         course = get_object_or_404(Course, id=course_id)
+#         if request.user.is_student:
+#             student, created = Student.objects.get_or_create(user=request.user)
+#             if course not in student.enrolled_courses.all():
+#                 student.enrolled_courses.add(course)
+#                 student.save()
+#         return redirect('core:home')

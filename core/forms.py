@@ -18,6 +18,20 @@ class CustomUserCreationForm(UserCreationForm):
         if User.objects.filter(username=username).exists():
             raise forms.ValidationError('A user with that email already exists.')
         return username
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user_type = self.cleaned_data['user_type']
+        if user_type == 'student':
+            user.is_student = True
+            user.is_teacher = False
+        elif user_type == 'teacher':
+            user.is_student = False
+            user.is_teacher = True
+        user.user_type = user_type
+        if commit:
+            user.save()
+        return user
 
 
 class CustomAuthenticationForm(AuthenticationForm):

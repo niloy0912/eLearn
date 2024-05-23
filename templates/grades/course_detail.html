@@ -1,0 +1,35 @@
+{% extends "core/base.html" %}
+
+{% block title %}Course Details{% endblock %}
+
+{% block content %}
+<div class="course-detail-container">
+    <h2>{{ course.title }}</h2>
+    <h3>Assignments and Grades</h3>
+    <div class="assignments-grades">
+        <div class="assignments">
+            <ul>
+                {% for assignment, grade in assignment_grades %}
+                <li>{{ assignment.title }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="grades">
+            <ul>
+                {% for assignment, grade in assignment_grades %}
+                <li>
+                    {% if grade %}
+                        {{ grade.score }}
+                    {% else %}
+                        Not graded
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="total-points">
+        <p>Total Score: {{ percentage }}%</p>
+    </div>
+</div>
+{% endblock %}
