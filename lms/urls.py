@@ -24,13 +24,14 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 
 urlpatterns = [
+    path('', include('core.urls')),
+    path('courses/', include('courses.urls')),
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
 
     path('grades/', include('grades.urls')),    
-    path('', include('core.urls')),
-    path('courses/', include('courses.urls')),
     path('assignments/', include('assignments.urls')),
+    path('materials/', include('course_material.urls')),
     
 ]
 

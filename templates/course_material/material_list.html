@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+
+{% block title %}Course Materials{% endblock %}
+
+{% block content %}
+<h2>Course Materials for {{ course.title }}</h2>
+<ul>
+    {% for material in materials %}
+        <li>
+            <h3>{{ material.title }}</h3>
+            <p>{{ material.content|linebreaks }}</p>
+            {% if user == material.created_by %}
+                <a href="{% url 'course_material:material_update' material.id %}">Edit</a>
+                <a href="{% url 'course_material:material_delete' material.id %}">Delete</a>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+{% if user.is_authenticated and user.is_teacher %}
+    <a href="{% url 'course_material:material_create' course.id %}">Add Material</a>
+{% endif %}
+<a href="{% url 'courses:course_detail' course.id %}">Back to Course</a>
+{% endblock %}

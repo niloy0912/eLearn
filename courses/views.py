@@ -6,7 +6,7 @@ from assignments.models import Submission
 from .forms import CourseForm
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from core.models import Student
+from course_material.models import CourseMaterial
 
 
 
@@ -26,11 +26,13 @@ class CourseDetailView(View):
         course = get_object_or_404(Course, pk=pk)
         assignments = course.assignments.all()
         enrolled_students = course.enrollments.all()
+        course_materials = CourseMaterial.objects.filter(course=course)
         is_enrolled = enrolled_students.filter(student=request.user).exists()
         return render(request, 'courses/course_detail.html', {
             'course': course,
             'assignments': assignments,
             'enrolled_students': enrolled_students,
+            'course_materials': course_materials,
             'is_enrolled': is_enrolled
         })
 
