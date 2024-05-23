@@ -7,6 +7,7 @@ from .forms import CourseForm
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from course_material.models import CourseMaterial
+from django.core.paginator import Paginator
 
 
 
@@ -25,14 +26,25 @@ class CourseDetailView(View):
     def get(self, request, pk):
         course = get_object_or_404(Course, pk=pk)
         assignments = course.assignments.all()
+        materials = CourseMaterial.objects.filter(course=course)
+
+        # Pagination for assignments
+        assignment_paginator = Paginator(assignments, 5)  # Show 5 assignments per page
+        assignment_page_number = request.GET.get('assignment_page')
+        assignment_page_obj = assignment_paginator.get_page(assignment_page_number)
+
+        # Pagination for materials
+        material_paginator = Paginator(materials, 5)  # Show 5 materials per page
+        material_page_number = request.GET.get('material_page')
+        material_page_obj = material_paginator.get_page(material_page_number)
+
         enrolled_students = course.enrollments.all()
-        course_materials = CourseMaterial.objects.filter(course=course)
         is_enrolled = enrolled_students.filter(student=request.user).exists()
         return render(request, 'courses/course_detail.html', {
             'course': course,
-            'assignments': assignments,
+            'assignments': assignment_page_obj,
             'enrolled_students': enrolled_students,
-            'course_materials': course_materials,
+            'course_materials': material_page_obj,
             'is_enrolled': is_enrolled
         })
 

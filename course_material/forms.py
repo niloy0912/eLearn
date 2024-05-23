@@ -4,4 +4,4 @@ from .models import CourseMaterial
 class CourseMaterialForm(forms.ModelForm):
     class Meta:
         model = CourseMaterial
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'file']  # Add file field

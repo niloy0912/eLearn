@@ -3,11 +3,19 @@
 {% block title %}Delete Material{% endblock %}
 
 {% block content %}
-<h2>Delete Material</h2>
-<p>Are you sure you want to delete the material "{{ material.title }}"?</p>
-<form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Yes, delete</button>
-    <a href="{% url 'course_material:material_list' material.course.id %}" class="btn btn-secondary">Cancel</a>
-</form>
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Delete Course Material</h2>
+        </div>
+        <div class="card-body">
+            <p>Are you sure you want to delete the material "{{ material.title }}"?</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Yes, delete</button>
+                <a href="{% url 'course_material:material_list' material.course.id %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
