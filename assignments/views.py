@@ -83,22 +83,23 @@ class AssignmentUpdateView(View):
 class AssignmentDeleteView(View):
     def get(self, request, pk):
         assignment = get_object_or_404(Assignment, pk=pk)
-        form = AssignmentForm(instance=assignment)
+        # form = AssignmentForm(instance=assignment)
         # previosly assignment was passed directly
-        return render(request, 'assignments/assignment_confirm_delete.html', {'form': form})
+        return render(request, 'assignments/assignment_confirm_delete.html', {'assignment': assignment})
 
-    def post(self, request, pk):
-            assignment = get_object_or_404(Assignment, pk=pk)
-            form = AssignmentForm(request.POST, instance=assignment)
-            if form.is_valid():
-                form.save()
-                return redirect('assignments:assignment_detail', pk=pk)
-            return render(request, 'assignments/assignment_form.html', {'form': form})
-        
     # def post(self, request, pk):
-    #     assignment = get_object_or_404(Assignment, pk=pk)
-    #     assignment.delete()
-    #     return redirect('assignments:assignment_list')
+    #         assignment = get_object_or_404(Assignment, pk=pk)
+    #         form = AssignmentForm(request.POST, instance=assignment)
+    #         if form.is_valid():
+    #             form.save()
+    #             return redirect('assignments:assignment_detail', pk=pk)
+    #         return render(request, 'assignments/assignment_form.html', {'form': form})
+           
+    def post(self, request, pk):
+        assignment = get_object_or_404(Assignment, pk=pk)
+        course_id = assignment.course.id  # Retrieve the course ID
+        assignment.delete()
+        return redirect(reverse('courses:course_detail', args=[course_id]))
 
 @method_decorator(login_required, name='dispatch')
 class SubmissionCreateView(View):

@@ -17,10 +17,12 @@ class Home(View):
             context['username'] = request.user.username
             if request.user.is_student:
                 self.ensure_student_record(request.user)
+                student = get_object_or_404(Student, user=request.user)
+                # enrolled_courses = student.enrolled_courses.all()
                 available_courses = Course.objects.all()
                 context['available_courses'] = available_courses
-
             elif request.user.is_teacher:
+                context['is_teacher'] = True  # Add this context variable
                 available_courses = Course.objects.filter(teacher=request.user)
                 context['available_courses'] = available_courses
         return render(request, 'core/home.html', context)

@@ -8,7 +8,7 @@
     {% if user.is_authenticated and user.is_teacher %}
     <div class="add-course">
         <a href="{% url 'courses:course_create' %}" class="btn btn-primary">Add Course</a>
-        </div>
+    </div>
     {% endif %}
 </div>
 <div class="course-container">

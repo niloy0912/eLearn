@@ -20,11 +20,43 @@
 </div>
 
 {% if user.is_authenticated and user.is_student %}
-    <div class='home-container'>
-        <h1>Enrolled Courses</h1>
-        <a href="{% url 'courses:student_course_list' %}" class="btn">View Enrolled Courses</a>
+<div class='home-container'>
+    <h1>Enrolled Courses</h1>
+    <a href="{% url 'courses:student_course_list' %}" class="btn">My Enrolled Courses</a> 
+        <div class="course-list-container">
+            {% for course_detail in enrolled_course_details %}
+            <div class="course-tile">
+                <h2>{{ course_detail.course.title }}</h2>
+                <h3>Assignments and Grades</h3>
+                <div class="assignments-grades">
+                    <div class="assignments">
+                        <ul>
+                            {% for assignment, grade in course_detail.assignment_grades %}
+                            <li>{{ assignment.title }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="grades">
+                        <ul>
+                            {% for assignment, grade in course_detail.assignment_grades %}
+                            <li>
+                                {% if grade %}
+                                    {{ grade.score }}
+                                {% else %}
+                                    Not graded
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="total-points">
+                    <p>Total Score: {{ course_detail.percentage }}%</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
-
     <div class='home-container'>
         <h1>Available Courses</h1>
         <div class="course-list-container">
@@ -53,6 +85,9 @@
         </div>
         <div class="add-course-container">
             <a href="{% url 'courses:course_create' %}" class="add-course-button">Add Course</a>
+        </div>
+        <div class="view-all-courses">
+            <a href="{% url 'courses:course_list' %}" class="btn">View All Courses</a>
         </div>
     </div>
 {% endif %}

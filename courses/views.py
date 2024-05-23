@@ -9,11 +9,16 @@ from django.utils.decorators import method_decorator
 from core.models import Student
 
 
+
 @method_decorator(login_required, name='dispatch')
 class CourseListView(View):
     def get(self, request):
-        courses = Course.objects.all()
+        if request.user.is_teacher:
+            courses = Course.objects.all()  # Teachers can see all courses
+        else:
+            courses = Course.objects.filter(enrollments__student=request.user)  # Students see their enrolled courses
         return render(request, 'courses/course_list.html', {'courses': courses})
+
 
 @method_decorator(login_required, name='dispatch')
 class CourseDetailView(View):
@@ -89,13 +94,13 @@ class EnrollCourseView(View):
     def post(self, request, pk):
         course = get_object_or_404(Course, pk=pk)
         # Check if the user is the teacher of the course
-        if course.teacher == request.user:
+        if course.teacher == request.user or request.user.is_teacher:
             # Redirect to the course detail page with an error message
             return render(request, 'courses/course_detail.html', {
                 'course': course,
                 'enrolled_students': course.enrollments.all(),
                 'is_enrolled': False,
-                'error_message': "Teachers cannot enroll in their own courses."
+                'error_message': "Teachers cannot enroll in courses."
             })
         
         # Check if the user is already enrolled
@@ -103,43 +108,6 @@ class EnrollCourseView(View):
             Enrollment.objects.create(student=request.user, course=course)
         
         return redirect('courses:course_detail', pk=pk)
-
-
-# @method_decorator(login_required, name='dispatch')
-# class StudentCourseListView(View):
-#     def get(self, request):
-#         context = {}
-#         if request.user.is_authenticated and request.user.is_student:
-#             enrollments = Enrollment.objects.filter(student=request.user)
-#             enrolled_course_details = self.get_course_details(enrollments)
-#             context['enrolled_course_details'] = enrolled_course_details
-#         return render(request, 'courses/student_course_list.html', context)
-
-#     def get_course_details(self, enrollments):
-#         course_details = []
-#         for enrollment in enrollments:
-#             course = enrollment.course
-#             assignments = course.assignments.all()
-#             submissions = Submission.objects.filter(assignment__in=assignments, student=enrollment.student)
-#             total_score = 0
-#             total_marks = 0
-#             assignment_grades = []
-
-#             for assignment in assignments:
-#                 submission = submissions.filter(assignment=assignment).first()
-#                 grade = submission.grade if submission and hasattr(submission, 'grade') else None
-#                 assignment_grades.append((assignment, grade))
-#                 if grade:
-#                     total_score += grade.score
-#                     total_marks += assignment.total_marks
-
-#             percentage = (total_score / total_marks * 100) if total_marks else 0
-#             course_details.append({
-#                 'course': course,
-#                 'assignment_grades': assignment_grades,
-#                 'percentage': percentage
-#             })
-#         return course_details
 
 
 @method_decorator(login_required, name='dispatch')
