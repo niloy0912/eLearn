@@ -6,8 +6,7 @@ from django.contrib.auth import login, logout
 from .models import Student, Teacher
 from django.views import View
 from courses.models import Course
-from assignments.models import Submission
-from .forms import *
+from .forms import CustomUserCreationForm
 
 
 @method_decorator(login_required, name='dispatch')
@@ -18,13 +17,7 @@ class Home(View):
             context['username'] = request.user.username
             if request.user.is_student:
                 self.ensure_student_record(request.user)
-                student = get_object_or_404(Student, user=request.user)
-                enrolled_courses = student.enrolled_courses.all()
-                available_courses = Course.objects.exclude(students=student)
-
-                enrolled_course_details = self.get_course_details(enrolled_courses, request.user)
-                
-                context['enrolled_course_details'] = enrolled_course_details
+                available_courses = Course.objects.all()
                 context['available_courses'] = available_courses
 
             elif request.user.is_teacher:
@@ -42,31 +35,6 @@ class Home(View):
     def ensure_teacher_record(self, user):
         if user.is_teacher and not Teacher.objects.filter(user=user).exists():
             Teacher.objects.create(user=user)
-    
-    def get_course_details(self, courses, user):
-        course_details = []
-        for course in courses:
-            assignments = course.assignments.all()
-            submissions = Submission.objects.filter(assignment__in=assignments, student=user)
-            total_score = 0
-            total_marks = 0
-            assignment_grades = []
-
-            for assignment in assignments:
-                submission = submissions.filter(assignment=assignment).first()
-                grade = submission.grade if submission and hasattr(submission, 'grade') else None
-                assignment_grades.append((assignment, grade))
-                if grade:
-                    total_score += grade.score
-                    total_marks += assignment.total_marks
-
-            percentage = (total_score / total_marks * 100) if total_marks else 0
-            course_details.append({
-                'course': course,
-                'assignment_grades': assignment_grades,
-                'percentage': percentage
-            })
-        return course_details
 
 
 class Register(View):
@@ -90,7 +58,6 @@ class Register(View):
                     user.is_teacher = True
                 user.save()
                 
-                # print(user.password2)
                 login(request, user)
                 return redirect('home')  # Redirect to home page
             except IntegrityError:
@@ -102,40 +69,3 @@ class LogOut(View):
     def get(self, request):
         logout(request)
         return redirect('home')
-
-
-
-# class LogIn(View):
-#     def get(self, request):
-        
-#         print("login get called")
-        
-#         form = CustomAuthenticationForm()
-#         # print(form.is_bound)
-#         return render(request, 'registration/signup.html', {'form': form})
-
-#     def post(self, request):
-#         form = CustomAuthenticationForm(data=request.POST)
-        
-#         print("login post called")
-
-#         # print(form.is_valid()) 
-#         if form.is_valid():
-#             print("form is valid")
-#             username = form.cleaned_data.get('username')
-#             password = form.cleaned_data.get('password')
-#             print(username, password)
-#             user = authenticate(request, username=username, password=password)
-#             print(user)
-#             if user is not None:
-#                 login(request, user)
-#                 return redirect('home')
-#         # print(form.errors)
-        
-#         return render(request, 'registration/signup.html', {'form': form})  
-    
-            
-# def logout_1(request):
-    # print("Logout called")
-    # logout(request)
-    # return redirect('home')

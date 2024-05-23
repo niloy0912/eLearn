@@ -9,7 +9,7 @@ class Assignment(models.Model):
     description = models.TextField()
     due_date = models.DateField()
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='assignments')
-    total_marks = models.FloatField(default=100)  # Add this field
+    total_marks = models.FloatField(default=100) 
 
     def __str__(self):
         return self.title

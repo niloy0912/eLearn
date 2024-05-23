@@ -22,39 +22,7 @@
 {% if user.is_authenticated and user.is_student %}
     <div class='home-container'>
         <h1>Enrolled Courses</h1>
-        <div class="course-list-container">
-            {% for course_detail in enrolled_course_details %}
-            <div class="course-tile">
-                <h2>{{ course_detail.course.name }}</h2>
-                <h3>Assignments and Grades</h3>
-                <div class="assignments-grades">
-                    <div class="assignments">
-                        <ul>
-                            {% for assignment, grade in course_detail.assignment_grades %}
-                            <li>{{ assignment.title }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <div class="grades">
-                        <ul>
-                            {% for assignment, grade in course_detail.assignment_grades %}
-                            <li>
-                                {% if grade %}
-                                    {{ grade.score }}
-                                {% else %}
-                                    Not graded
-                                {% endif %}
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-                <div class="total-points">
-                    <p>Total Score: {{ course_detail.percentage }}%</p>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+        <a href="{% url 'courses:student_course_list' %}" class="btn">View Enrolled Courses</a>
     </div>
 
     <div class='home-container'>
@@ -62,7 +30,7 @@
         <div class="course-list-container">
             {% for course in available_courses %}
             <div class="course-tile">
-                <h2>{{ course.name }}</h2>
+                <h2>{{ course.title }}</h2>
                 <p>{{ course.description }}</p>
                 <a href="{% url 'courses:course_detail' course.pk %}">View Course</a>
             </div>
@@ -77,7 +45,7 @@
         <div class="course-list-container">
             {% for course in available_courses %}
             <div class="course-tile">
-                <h2>{{ course.name }}</h2>
+                <h2>{{ course.title }}</h2>
                 <p>{{ course.description }}</p>
                 <a href="{% url 'courses:course_detail' course.pk %}">View Course</a>
             </div>

@@ -1,11 +1,13 @@
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 from django.views import View
 from .models import Assignment, Submission, Grade
 from .forms import AssignmentForm, SubmissionForm, GradeForm
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 @method_decorator(login_required, name='dispatch')
 class AssignmentListView(View):
@@ -63,12 +65,22 @@ class AssignmentUpdateView(View):
 class AssignmentDeleteView(View):
     def get(self, request, pk):
         assignment = get_object_or_404(Assignment, pk=pk)
-        return render(request, 'assignments/assignment_confirm_delete.html', {'assignment': assignment})
+        form = AssignmentForm(instance=assignment)
+        # previosly assignment was passed directly
+        return render(request, 'assignments/assignment_confirm_delete.html', {'form': form})
 
     def post(self, request, pk):
-        assignment = get_object_or_404(Assignment, pk=pk)
-        assignment.delete()
-        return redirect('assignments:assignment_list')
+            assignment = get_object_or_404(Assignment, pk=pk)
+            form = AssignmentForm(request.POST, instance=assignment)
+            if form.is_valid():
+                form.save()
+                return redirect('assignments:assignment_detail', pk=pk)
+            return render(request, 'assignments/assignment_form.html', {'form': form})
+        
+    # def post(self, request, pk):
+    #     assignment = get_object_or_404(Assignment, pk=pk)
+    #     assignment.delete()
+    #     return redirect('assignments:assignment_list')
 
 @method_decorator(login_required, name='dispatch')
 class SubmissionCreateView(View):
@@ -105,39 +117,45 @@ class SubmissionCreateView(View):
         return render(request, 'assignments/submission_form.html', {'form': form, 'assignment': assignment})
 
 
-class GradeAssignmentView(LoginRequiredMixin, View):
+@method_decorator(login_required, name='dispatch')
+class GradeAssignmentView(View):
     def get(self, request, pk):
         submission = get_object_or_404(Submission, pk=pk)
         assignment = submission.assignment
-        # Check if the user is the teacher of the course
         if assignment.course.teacher != request.user:
             return HttpResponseForbidden("You are not allowed to grade this assignment.")
-        
+
+        # Check if the grade exists
         try:
             grade = submission.grade
             form = GradeForm(instance=grade)
         except Grade.DoesNotExist:
             form = GradeForm()
-        
+
         return render(request, 'assignments/grade_form.html', {'form': form, 'submission': submission})
 
     def post(self, request, pk):
         submission = get_object_or_404(Submission, pk=pk)
         assignment = submission.assignment
-        # Check if the user is the teacher of the course
         if assignment.course.teacher != request.user:
             return HttpResponseForbidden("You are not allowed to grade this assignment.")
-        
+
+        # Check if the grade exists
         try:
             grade = submission.grade
             form = GradeForm(request.POST, instance=grade)
         except Grade.DoesNotExist:
             form = GradeForm(request.POST)
-        
+
         if form.is_valid():
+            score = form.cleaned_data.get('score')
+            if score > assignment.total_marks:
+                form.add_error('score', 'Score cannot be higher than total marks.')
+                return render(request, 'assignments/grade_form.html', {'form': form, 'submission': submission})
+
             grade = form.save(commit=False)
             grade.submission = submission
             grade.save()
-            return redirect('grades:course_detail', pk=assignment.course.pk)
-        
+            return redirect(reverse('courses:course_detail', kwargs={'pk': assignment.course.pk}))
+
         return render(request, 'assignments/grade_form.html', {'form': form, 'submission': submission})

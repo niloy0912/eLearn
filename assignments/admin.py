@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Assignment, Submission, Grade
 
+# assignments admin to register assignments, submissions and grades for the submissions
 @admin.register(Assignment)
 class AssignmentAdmin(admin.ModelAdmin):
     list_display = ('title', 'course', 'due_date')
