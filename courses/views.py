@@ -105,6 +105,43 @@ class EnrollCourseView(View):
         return redirect('courses:course_detail', pk=pk)
 
 
+# @method_decorator(login_required, name='dispatch')
+# class StudentCourseListView(View):
+#     def get(self, request):
+#         context = {}
+#         if request.user.is_authenticated and request.user.is_student:
+#             enrollments = Enrollment.objects.filter(student=request.user)
+#             enrolled_course_details = self.get_course_details(enrollments)
+#             context['enrolled_course_details'] = enrolled_course_details
+#         return render(request, 'courses/student_course_list.html', context)
+
+#     def get_course_details(self, enrollments):
+#         course_details = []
+#         for enrollment in enrollments:
+#             course = enrollment.course
+#             assignments = course.assignments.all()
+#             submissions = Submission.objects.filter(assignment__in=assignments, student=enrollment.student)
+#             total_score = 0
+#             total_marks = 0
+#             assignment_grades = []
+
+#             for assignment in assignments:
+#                 submission = submissions.filter(assignment=assignment).first()
+#                 grade = submission.grade if submission and hasattr(submission, 'grade') else None
+#                 assignment_grades.append((assignment, grade))
+#                 if grade:
+#                     total_score += grade.score
+#                     total_marks += assignment.total_marks
+
+#             percentage = (total_score / total_marks * 100) if total_marks else 0
+#             course_details.append({
+#                 'course': course,
+#                 'assignment_grades': assignment_grades,
+#                 'percentage': percentage
+#             })
+#         return course_details
+
+
 @method_decorator(login_required, name='dispatch')
 class StudentCourseListView(View):
     def get(self, request):

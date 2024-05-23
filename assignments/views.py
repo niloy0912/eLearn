@@ -16,19 +16,37 @@ class AssignmentListView(View):
         return render(request, 'assignments/assignment_list.html', {'assignments': assignments})
 
 
+# @method_decorator(login_required, name='dispatch')
+# class AssignmentDetailView(View):
+#     def get(self, request, pk):
+#         assignment = get_object_or_404(Assignment, pk=pk)
+#         submissions = assignment.submissions.all()
+#         user_submission_exists = submissions.filter(student=request.user).exists()
+#         is_teacher = assignment.course.teacher == request.user
+#         return render(request, 'assignments/assignment_detail.html', {
+#             'assignment': assignment,
+#             'submissions': submissions,
+#             'user_submission_exists': user_submission_exists,
+#             'is_teacher': is_teacher
+#         })
+  
+      
 @method_decorator(login_required, name='dispatch')
 class AssignmentDetailView(View):
     def get(self, request, pk):
         assignment = get_object_or_404(Assignment, pk=pk)
         submissions = assignment.submissions.all()
         user_submission_exists = submissions.filter(student=request.user).exists()
+        # user_submission = submissions.filter(student=request.user).first() if user_submission_exists else None
         is_teacher = assignment.course.teacher == request.user
+
         return render(request, 'assignments/assignment_detail.html', {
             'assignment': assignment,
             'submissions': submissions,
             'user_submission_exists': user_submission_exists,
+            # 'user_submission': user_submission,
             'is_teacher': is_teacher
-        })
+        })       
         
         
 @method_decorator(login_required, name='dispatch')
@@ -117,6 +135,50 @@ class SubmissionCreateView(View):
         return render(request, 'assignments/submission_form.html', {'form': form, 'assignment': assignment})
 
 
+# @method_decorator(login_required, name='dispatch')
+# class GradeAssignmentView(View):
+#     def get(self, request, pk):
+#         submission = get_object_or_404(Submission, pk=pk)
+#         assignment = submission.assignment
+#         if assignment.course.teacher != request.user:
+#             return HttpResponseForbidden("You are not allowed to grade this assignment.")
+
+#         # Check if the grade exists
+#         try:
+#             grade = submission.grade
+#             form = GradeForm(instance=grade)
+#         except Grade.DoesNotExist:
+#             form = GradeForm()
+
+#         return render(request, 'assignments/grade_form.html', {'form': form, 'submission': submission})
+
+#     def post(self, request, pk):
+#         submission = get_object_or_404(Submission, pk=pk)
+#         assignment = submission.assignment
+#         if assignment.course.teacher != request.user:
+#             return HttpResponseForbidden("You are not allowed to grade this assignment.")
+
+#         # Check if the grade exists
+#         try:
+#             grade = submission.grade
+#             form = GradeForm(request.POST, instance=grade)
+#         except Grade.DoesNotExist:
+#             form = GradeForm(request.POST)
+
+#         if form.is_valid():
+#             score = form.cleaned_data.get('score')
+#             if score > assignment.total_marks:
+#                 form.add_error('score', 'Score cannot be higher than total marks.')
+#                 return render(request, 'assignments/grade_form.html', {'form': form, 'submission': submission})
+
+#             grade = form.save(commit=False)
+#             grade.submission = submission
+#             grade.save()
+#             return redirect(reverse('courses:course_detail', kwargs={'pk': assignment.course.pk}))
+
+#         return render(request, 'assignments/grade_form.html', {'form': form, 'submission': submission})
+
+
 @method_decorator(login_required, name='dispatch')
 class GradeAssignmentView(View):
     def get(self, request, pk):
@@ -125,14 +187,18 @@ class GradeAssignmentView(View):
         if assignment.course.teacher != request.user:
             return HttpResponseForbidden("You are not allowed to grade this assignment.")
 
-        # Check if the grade exists
         try:
             grade = submission.grade
             form = GradeForm(instance=grade)
         except Grade.DoesNotExist:
             form = GradeForm()
 
-        return render(request, 'assignments/grade_form.html', {'form': form, 'submission': submission})
+        return render(request, 'assignments/grade_form.html', {
+            'form': form,
+            'submission': submission,
+            'assignment': assignment,
+            'content': submission.content  # Pass the content to the template
+        })
 
     def post(self, request, pk):
         submission = get_object_or_404(Submission, pk=pk)
@@ -140,7 +206,6 @@ class GradeAssignmentView(View):
         if assignment.course.teacher != request.user:
             return HttpResponseForbidden("You are not allowed to grade this assignment.")
 
-        # Check if the grade exists
         try:
             grade = submission.grade
             form = GradeForm(request.POST, instance=grade)
@@ -151,11 +216,21 @@ class GradeAssignmentView(View):
             score = form.cleaned_data.get('score')
             if score > assignment.total_marks:
                 form.add_error('score', 'Score cannot be higher than total marks.')
-                return render(request, 'assignments/grade_form.html', {'form': form, 'submission': submission})
+                return render(request, 'assignments/grade_form.html', {
+                    'form': form,
+                    'submission': submission,
+                    'assignment': assignment,
+                    'content': submission.content  # Pass the content to the template
+                })
 
             grade = form.save(commit=False)
             grade.submission = submission
             grade.save()
             return redirect(reverse('courses:course_detail', kwargs={'pk': assignment.course.pk}))
 
-        return render(request, 'assignments/grade_form.html', {'form': form, 'submission': submission})
+        return render(request, 'assignments/grade_form.html', {
+            'form': form,
+            'submission': submission,
+            'assignment': assignment,
+            'content': submission.content  # Pass the content to the template
+        })

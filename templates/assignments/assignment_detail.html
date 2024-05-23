@@ -18,6 +18,14 @@
                 {% if request.user == assignment.course.teacher %}
                     <a href="{% url 'assignments:assignment_grade' submission.pk %}" class="btn">Grade</a>
                 {% endif %}
+                {% if submission.student == request.user %}
+                    {% if submission.grade %}
+                        <p><strong>Score:</strong> {{ submission.grade.score }}</p>
+                        <p><strong>Feedback:</strong> {{ submission.grade.feedback }}</p>
+                    {% else %}
+                        <p>Not graded yet</p>
+                    {% endif %}
+                {% endif %}
             </li>
         {% endfor %}
     </ul>
@@ -31,8 +39,14 @@
     {% if request.user.is_authenticated and not user_submission_exists and not is_teacher %}
         <a href="{% url 'assignments:assignment_submit' assignment.pk %}" class="btn">Submit Assignment</a>
     {% endif %}
-    {% if user_submission_exists %}
+    {% if user_submission_exists and user_submission %}
         <p>You have already submitted this assignment.</p>
+        {% if user_submission.grade %}
+            <p><strong>Your Score:</strong> {{ user_submission.grade.score }}</p>
+            <p><strong>Your Feedback:</strong> {{ user_submission.grade.feedback }}</p>
+        {% else %}
+            <p>Your submission has not been graded yet.</p>
+        {% endif %}
     {% endif %}
 </div>
 {% endblock %}
