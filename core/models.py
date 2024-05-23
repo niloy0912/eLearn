@@ -5,6 +5,11 @@ from courses.models import Course
 # Create your models here.
 
 class User(AbstractUser):
+    USER_TYPE_CHOICES = (
+        ('student', 'Student'),
+        ('teacher', 'Teacher'),
+    )
+          
     is_student = models.BooleanField(default=False)
     is_teacher = models.BooleanField(default=False)
     profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
@@ -12,8 +17,10 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=15, null=True, blank=True)
     address = models.CharField(max_length=255, null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
-    # user_type = models.CharField(max_length=20, default=Student)
+    user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES, default='student')
+
     
+    # enrolled_courses = models.ManyToManyField(Course, related_name='students', blank=True)
     USERNAME_FIELD = 'username'
     # REQUIRED_FIELDS = ['username']
 
@@ -34,6 +41,8 @@ class User(AbstractUser):
         
     def __str__(self):
         return self.username
+    
+
 
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)

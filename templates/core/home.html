@@ -9,7 +9,6 @@
     {% else %}
         <h1>Welcome to eLearn</h1>
         <p>Your one-stop solution for managing courses, assignments, and more.</p>
-        <p>Login or Signup to view courses</p>
     {% endif %}
     <div class="home-links">
         {% if not user.is_authenticated %}
@@ -20,11 +19,41 @@
     <br>
 </div>
 
-{% if user.is_authenticated %}
+{% if user.is_authenticated and user.is_student %}
+    <div class='home-container'>
+        <h1>Enrolled Courses</h1>
+        <a href="{% url 'courses:student_course_list' %}" class="btn">View Enrolled Courses</a>
+    </div>
+
     <div class='home-container'>
         <h1>Available Courses</h1>
-        <p><a href="{% url 'courses:course_list' %}">View Courses</a></p>
+        <div class="course-list-container">
+            {% for course in available_courses %}
+            <div class="course-tile">
+                <h2>{{ course.title }}</h2>
+                <p>{{ course.description }}</p>
+                <a href="{% url 'courses:course_detail' course.pk %}">View Course</a>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 {% endif %}
 
+{% if user.is_authenticated and user.is_teacher %}
+    <div class='home-container'>
+        <h1>Your Courses</h1>
+        <div class="course-list-container">
+            {% for course in available_courses %}
+            <div class="course-tile">
+                <h2>{{ course.title }}</h2>
+                <p>{{ course.description }}</p>
+                <a href="{% url 'courses:course_detail' course.pk %}">View Course</a>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="add-course-container">
+            <a href="{% url 'courses:course_create' %}" class="add-course-button">Add Course</a>
+        </div>
+    </div>
+{% endif %}
 {% endblock %}

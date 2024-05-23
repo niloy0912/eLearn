@@ -6,11 +6,18 @@
 <div class="assignment-container">
     <h2>Grade Assignment: {{ submission.assignment.title }}</h2>
     <p>Student: {{ submission.student.username }}</p>
+    <p><strong>Submitted Content:</strong></p>
+    <div class="submitted-content">
+        <p>{{ content }}</p> 
+    </div>
     <form method="post">
         {% csrf_token %}
         <div class="form-group">
             <label for="id_score">Score</label>
             {{ form.score }}
+            {% if form.errors.score %}
+                <div class="error-message">{{ form.errors.score }}</div>
+            {% endif %}
         </div>
         <div class="form-group">
             <label for="id_feedback">Feedback</label>

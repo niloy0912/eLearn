@@ -146,6 +146,11 @@ main {
     text-decoration: underline;
 }
 
+.btn{
+    margin-top: 50px;
+    z-index: 4;
+}
+
 footer {
     background-color: #007BFF;
     color: white;

@@ -1,23 +1,42 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db import IntegrityError
-from django.contrib.auth import login, logout, authenticate
-
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.contrib.auth import login, logout
+from .models import Student, Teacher
 from django.views import View
-from .forms import *
+from courses.models import Course
+from .forms import CustomUserCreationForm
 
 
-# Create your views here.
+@method_decorator(login_required, name='dispatch')
 class Home(View):
     def get(self, request):
         context = {}
         if request.user.is_authenticated:
             context['username'] = request.user.username
+            if request.user.is_student:
+                self.ensure_student_record(request.user)
+                available_courses = Course.objects.all()
+                context['available_courses'] = available_courses
+
+            elif request.user.is_teacher:
+                available_courses = Course.objects.filter(teacher=request.user)
+                context['available_courses'] = available_courses
         return render(request, 'core/home.html', context)
     
     def post(self, request):
         return render(request, 'core/home.html')
     
+    def ensure_student_record(self, user):
+        if user.is_student and not Student.objects.filter(user=user).exists():
+            Student.objects.create(user=user)
     
+    def ensure_teacher_record(self, user):
+        if user.is_teacher and not Teacher.objects.filter(user=user).exists():
+            Teacher.objects.create(user=user)
+
+
 class Register(View):
     def get(self, request):
         form = CustomUserCreationForm()
@@ -39,7 +58,6 @@ class Register(View):
                     user.is_teacher = True
                 user.save()
                 
-                # print(user.password2)
                 login(request, user)
                 return redirect('home')  # Redirect to home page
             except IntegrityError:
@@ -51,40 +69,3 @@ class LogOut(View):
     def get(self, request):
         logout(request)
         return redirect('home')
-
-
-
-# class LogIn(View):
-#     def get(self, request):
-        
-#         print("login get called")
-        
-#         form = CustomAuthenticationForm()
-#         # print(form.is_bound)
-#         return render(request, 'registration/signup.html', {'form': form})
-
-#     def post(self, request):
-#         form = CustomAuthenticationForm(data=request.POST)
-        
-#         print("login post called")
-
-#         # print(form.is_valid()) 
-#         if form.is_valid():
-#             print("form is valid")
-#             username = form.cleaned_data.get('username')
-#             password = form.cleaned_data.get('password')
-#             print(username, password)
-#             user = authenticate(request, username=username, password=password)
-#             print(user)
-#             if user is not None:
-#                 login(request, user)
-#                 return redirect('home')
-#         # print(form.errors)
-        
-#         return render(request, 'registration/signup.html', {'form': form})  
-    
-            
-# def logout_1(request):
-    # print("Logout called")
-    # logout(request)
-    # return redirect('home')
